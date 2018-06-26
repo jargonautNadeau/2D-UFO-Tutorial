@@ -8,6 +8,8 @@ public class PlayerController : MonoBehaviour {
 	public Text countText;
 	public Text scoreText;
 	public Text winText;
+	public float interactionRange = 300.0f;
+	public int winTotal = 300;
 
 	private bool wonGame;
 	private int count;
@@ -33,30 +35,89 @@ public class PlayerController : MonoBehaviour {
 		if(speed > initialSpeed){
 			speed -= 1.0f;
 		}
-		if (count >= 5) {
+		if (score >= winTotal) {
 			wonGame = true;
 		}
+		if (Input.GetKeyUp(KeyCode.F)) {
+			Debug.Log ("Pressed F");
+			GameObject closestInteractable = FindClosestInteractable ();
+			if (closestInteractable != null) {
+				if (closestInteractable.CompareTag ("Portal")) {
+					closestInteractable.GetComponent<Portal> ().buyPortal();
+				}
+			}
+		}
+		UpdateUI ();
 	}
-		
-	void OnTriggerEnter2D(Collider2D other) {
-		Debug.Log ("Tag: " + other.gameObject.tag);
-		if (other.gameObject.CompareTag("PickUp")) {
-			other.gameObject.SetActive (false);
-			count += 1;
-			score += 15;
-			UpdateUI ();
-		} else if (other.gameObject.CompareTag("PowerUp")){
-			//Powerup
-			Debug.Log("POWERUP");
-			other.gameObject.SetActive (false);
-			speed += 100.0f;
+	void OnTriggerStay2D(Collider2D other) {
+		Debug.Log ("In Collider for: "+other.gameObject.name);
+		if (Input.GetKeyUp (KeyCode.E)) {
+			Debug.Log ("Pressed E");
+			if (other.gameObject.CompareTag ("Portal")) {
+				Portal p = other.gameObject.GetComponent<Portal> ();
+				Debug.Log ("Portal "+other.gameObject.name+" is locked? "+p.locked);
+				if (!p.locked) {
+					Debug.Log ("Pressed E");
+					transform.position = p.targetPortal.transform.position;
+				}
+			}
 		}
 	}
+	void OnTriggerEnter2D(Collider2D other) {
+		Debug.Log ("Tag: " + other.gameObject.tag);
+		if (other.gameObject.CompareTag ("PickUp")) {
+			other.gameObject.SetActive (false);
+			addCount (1);
+			score += 15;
+		} else if (other.gameObject.CompareTag ("PowerUp")) {
+			//Powerup
+			Debug.Log ("POWERUP");
+			other.gameObject.SetActive (false);
+			speed += 100.0f;
+		} else if (other.gameObject.CompareTag ("Portal")) {
+			
+		}
+	}
+
 	void UpdateUI(){
 		countText.text = "Count: " + count.ToString();
 		scoreText.text = "Score: " + score.ToString();
 		if (wonGame) {
 			winText.text = "You Win!!!";
+		}
+	}
+
+	public int getCount() {
+		return count;
+	}
+
+	public void addCount(int deltaValue) {
+		if ((count + deltaValue) < 0) {
+			count = 0;	
+		} else {
+			count += deltaValue;
+		}
+	}
+
+	public GameObject FindClosestInteractable() {
+		GameObject[] gos = GameObject.FindGameObjectsWithTag("Portal");
+		GameObject closest = null;
+		float distance = Mathf.Infinity;
+		Vector3 position = transform.position;
+		foreach (GameObject go in gos) {
+			Vector3 diff = go.transform.position - position;
+			float curDistance = diff.sqrMagnitude;
+			Debug.Log (go.name+" is "+curDistance+" away");
+			if (curDistance < distance) {
+				closest = go;
+				distance = curDistance;
+			}
+		}
+
+		if (distance < interactionRange) {
+			return closest;
+		} else {
+			return null;
 		}
 	}
 }
