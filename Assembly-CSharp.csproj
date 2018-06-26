@@ -55,6 +55,8 @@
      <Compile Include="Assets\_Completed-Assets\Scripts\CompletePlayerController.cs" />
      <Compile Include="Assets\_Completed-Assets\Scripts\CompleteRotator.cs" />
      <Compile Include="Assets\Scripts\CameraController.cs" />
+     <Compile Include="Assets\Scripts\Meteor.cs" />
+     <Compile Include="Assets\Scripts\Meter.cs" />
      <Compile Include="Assets\Scripts\NPCTalk.cs" />
      <Compile Include="Assets\Scripts\PlayerController.cs" />
      <Compile Include="Assets\Scripts\Portal.cs" />

@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour {
 	public float speed = 5.0f;
+	public float meteorStrength = 5000.0f;
 	public Text countText;
 	public Text scoreText;
 	public Text winText;
@@ -74,8 +75,13 @@ public class PlayerController : MonoBehaviour {
 			Debug.Log ("POWERUP");
 			other.gameObject.SetActive (false);
 			speed += 100.0f;
-		} else if (other.gameObject.CompareTag ("Portal")) {
-			
+		}
+	}
+	void OnCollisionEnter2D(Collision2D other) {
+		if (other.gameObject.CompareTag ("Meteor")) {
+			Debug.Log ("Hit a Meteor named "+other.gameObject.name);
+			Vector2 movement = other.gameObject.GetComponent<Rigidbody2D> ().velocity;
+			rb2d.AddForce (movement * meteorStrength);
 		}
 	}
 
